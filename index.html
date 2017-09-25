@@ -5,13 +5,17 @@
     <title>webrtc-bot-example</title>
   </head>
   <body>
-    <h1>Hello World!</h1>
-    <!-- All of the Node.js APIs are available in this renderer process. -->
-    We are using Node.js <script>document.write(process.versions.node)</script>,
-    Chromium <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>.
-
+    <h1>webrtc-bot-example</h1>
+    <p>This page is only shown when starting the app in debug mode.</p>
+    <ul>
+      <li>Node.js: <script>document.write(process.versions.node)</script></li>
+      <li>Chromium: <script>document.write(process.versions.chrome)</script></li>
+      <li>Electron: <script>document.write(process.versions.electron)</script></li>
+    </ul>
+    <p>See README on what this example app does.</p>
     <audio controls></audio>
+
+    <!-- Include the JS SDK since its used in the renderer (not the node.js SDK) -->
     <script type="text/javascript" src="./node_modules/circuit-sdk/dist/circuit.js"></script>
     <script type="text/javascript" src="./renderer.js"></script>
   </body>

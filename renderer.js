@@ -8,7 +8,8 @@ let client = new Circuit.Client({
   client_id: '235aff91bef7412f83f1f3fa0af07693',
   client_secret: '65dd12552c004526a90bfbe6db2e856e',
   domain: 'circuitsandbox.net',
-  autoRenewToken: true
+  autoRenewToken: true,
+  //emoticonMode: 'circuit'
 });
 
 function welcomeParticipant(callId, participant) {
@@ -102,10 +103,19 @@ client.addEventListener('callStatus', evt => {
     welcomeParticipant(call.callId, evt.participant);
     return;
   }
+
+  // New conference has started, join the call
+  if (evt.reason === 'callStateChanged' && call.state === Circuit.Enums.CallStateName.Active) {
+    console.log(call.getRemoteAudioStream());
+    return;
+  }
+
 });
 
 // Print all events for debugging
-Circuit.supportedEvents.forEach(e => client.addEventListener(e, console.log));
+Circuit.supportedEvents.forEach(e =>
+  client.addEventListener(e, console.log)
+);
 
 // Initialization
 client.logon()
