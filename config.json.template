@@ -1,0 +1,14 @@
+{
+  "sandbox": {
+      "domain": "circuitsandbox.net",
+      "client_id": "<your client_id>",
+      "client_secret": "<your client_secret>"
+      "autoRenewToken": true
+  },
+  "production": {
+      "domain": "eu.yourcircuit.com",
+      "client_id": "<your client_id>",
+      "client_secret": "<your client_secret>"
+      "autoRenewToken": true
+  }
+}

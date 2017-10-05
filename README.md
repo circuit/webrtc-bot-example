@@ -26,6 +26,8 @@
 ```bash
     git clone https://github.com/circuit/webrtc-bot-example.git
     cd webrtc-bot-example
+    cp config.json.template config.json
+    // Edit config.json with your credentials
     npm install
-    npm start
+    npm start // or npm run dev
 ```

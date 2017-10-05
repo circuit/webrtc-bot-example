@@ -2,15 +2,11 @@
 // client crendentials app would be needed to be in multiple calls at
 // the same time.
 
+const config = require('electron').remote.require('./config.json');
+
 const activeCalls = {};
 
-let client = new Circuit.Client({
-  client_id: '235aff91bef7412f83f1f3fa0af07693',
-  client_secret: '65dd12552c004526a90bfbe6db2e856e',
-  domain: 'circuitsandbox.net',
-  autoRenewToken: true,
-  //emoticonMode: 'circuit'
-});
+let client = new Circuit.Client(config.sandbox);
 
 function welcomeParticipant(callId, participant) {
   let url = 'https://watson-api-explorer.mybluemix.net/text-to-speech/api/v1/synthesize?';
