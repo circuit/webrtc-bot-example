@@ -3,17 +3,25 @@
 // the same time.
 
 const config = require('electron').remote.require('./config.json');
+const AUDIO_LEVEL_THRESHOLD = 50;
 
-const activeCalls = {};
+// Active call if joined by bot. In this example app the bot can only join one call at a time.
+let activeCall;
+
+// Silence checking interval
+let interval;
+
+// Change stats collection from 5s to 1s to be able to detect 5s of silence
+Circuit.RtpStatsConfig.COLLECTION_INTERVAL = 1000;
 
 let client = new Circuit.Client(config.sandbox);
 
-function welcomeParticipant(callId, participant) {
+function playSound(callId, text) {
   let url = 'https://watson-api-explorer.mybluemix.net/text-to-speech/api/v1/synthesize?';
   let params = Circuit.Utils.toQS({
     accept: 'audio/ogg;codecs=opus',
     voice: 'en-US_MichaelVoice',
-    text: `Hello ${participant.firstName}, glad you could make the call.`
+    text: text
   });
 
   fetch(`${url}?${params}`)
@@ -44,7 +52,32 @@ function welcomeParticipant(callId, participant) {
         */
       });
     })
-    .catch(console.error)
+    .catch(console.error);
+}
+
+/**
+ * Send a welcome announcement to the newly joined participant
+ * @method welcomeParticipant
+ * @param {String} callId callId of the call to mute.
+ * @param {Object} participant Participant object with a firstName attribute.
+ */
+function welcomeParticipant(callId, participant) {
+  playSound(callId, `Hello ${participant.firstName}, glad you could make the call.`);
+}
+
+/**
+ * Play announcement for someone to speak up
+ * @method playSilenceAnnouncement
+ * @param {String} callId callId.
+ */
+function playSilenceAnnouncement(callId) {
+  var announcements = [
+    'Somebody speak up',
+    'We don\'t have all day',
+    'Don\'t be shy, say something',
+    'It\'s getting late'
+  ];
+  playSound(callId, announcements[Math.floor(Math.random() * 4)]);
 }
 
 // Check if the item indicates this is a new conversation for the bot
@@ -65,23 +98,30 @@ client.addEventListener('itemAdded', evt => {
 });
 
 client.addEventListener('callEnded', evt => {
-  // Remove call from activeCalls list
-  delete activeCalls[evt.call.callId];
+  activeCall = null;
+  stopSilenceDetection();
 });
 
 client.addEventListener('callStatus', evt => {
   let call = evt.call;
 
+  if (activeCall && activeCall.callId !== call.callId) {
+    console.log('callStatus event for a different call, ignore it');
+    return;
+  }
+
   // New conference has started, join the call
   if (evt.reason === 'callStateChanged' && call.state === Circuit.Enums.CallStateName.Started) {
     // Don't join the call if bot had joined earlier
-    if (!activeCalls[call.callId]) {
+    if (!activeCall || activeCall.callId !== call.callId) {
       // Remember this active call so bot does not start it again after everyone
       // left the call. This is because 'joinConference' does also starts the conference.
-      activeCalls[call.callId] = true;
+      activeCall = call;
 
       client.joinConference(call.callId)
-        .then(() => console.log(`Joined call: ${call.callId}`));
+        .then(() => console.log(`Joined call: ${call.callId}`))
+        .then(() => startSilenceDetection(call.callId))
+        .catch(err => console.error(err));
     }
     return;
   }
@@ -100,13 +140,61 @@ client.addEventListener('callStatus', evt => {
     return;
   }
 
-  // New conference has started, join the call
-  if (evt.reason === 'callStateChanged' && call.state === Circuit.Enums.CallStateName.Active) {
-    console.log(call.getRemoteAudioStream());
+  if (evt.reason === 'remoteStreamUpdated') {
+    // Need to attach the stream to an audio element so that the audioOutputLevel stats (aol) are present
+    remoteAudio = document.getElementById('remoteAudio');
+
+    // Option 1: Attach stream to audio element's srcObject attribute
+    var audioStream = client.getRemoteStreams(activeCall.callId).find(s => s.getAudioTracks().length > 0);
+    remoteAudio.srcObject = audioStream;
+
+    // Option 2: Attach audio url to element's src attribute
+    remoteAudio.src = call.remoteAudioUrl;
     return;
   }
 
 });
+
+// Detect silence on incoming audio stream using RTP stats field 'audioLevelOutput' (aol)
+function startSilenceDetection(callId) {
+  var sum = 0;
+  var silenceCount = 0;
+  interval = setInterval(() => {
+    var aol = getAudioOutputLevel(callId);
+    console.log(`audioLevelOutput: ${aol}`);
+
+    if (aol === null || aol > AUDIO_LEVEL_THRESHOLD) {
+      // No stat received or someone is talking
+      silenceCount = 0;
+      return;
+    }
+
+    silenceCount++;
+    if (silenceCount >= 5) {
+      // We had 5sec on silence
+      playSilenceAnnouncement(callId);
+      silenceCount = 0;
+    }
+  }, 1000);
+}
+
+function stopSilenceDetection() {
+  clearInterval(interval);
+}
+
+function getAudioOutputLevel(callId) {
+  var stats = client.getLastRtpStats(callId);
+  if (stats) {
+    var stat = stats.find(stat => stat.pcType === 'AUDIO/VIDEO');
+    if (stat) {
+      return stat.audio.receive.aol;
+    }
+    return null;
+  }
+  return null;
+}
+
+
 
 // Print all events for debugging
 Circuit.supportedEvents.forEach(e =>
@@ -116,3 +204,5 @@ Circuit.supportedEvents.forEach(e =>
 // Initialization
 client.logon()
   .then(user => console.log(`Logged on as bot: ${user.emailAddress}`))
+  .catch(console.error);
+
