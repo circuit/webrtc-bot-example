@@ -145,8 +145,8 @@ client.addEventListener('callStatus', evt => {
     remoteAudio = document.getElementById('remoteAudio');
 
     // Option 1: Attach stream to audio element's srcObject attribute
-    var audioStream = client.getRemoteStreams(activeCall.callId).find(s => s.getAudioTracks().length > 0);
-    remoteAudio.srcObject = audioStream;
+    //var audioStream = client.getRemoteStreams(activeCall.callId).find(s => s.getAudioTracks().length > 0);
+    //remoteAudio.srcObject = audioStream;
 
     // Option 2: Attach audio url to element's src attribute
     remoteAudio.src = call.remoteAudioUrl;
@@ -183,7 +183,7 @@ function stopSilenceDetection() {
 }
 
 function getAudioOutputLevel(callId) {
-  var stats = client.getLastRtpStats(callId);
+  var stats = client.getLastRtpStats && client.getLastRtpStats(callId);
   if (stats) {
     var stat = stats.find(stat => stat.pcType === 'AUDIO/VIDEO');
     if (stat) {
