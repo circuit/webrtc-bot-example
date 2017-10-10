@@ -14,9 +14,9 @@
 * Use the new [`setAudioVideoStream`](https://circuitsandbox.net/sdk/classes/Client.html#method_setAudioVideoStream) API to transmit the greeting to the conference
 
 ### Detect 5s of silence and play an announcement
-* Use client.getRemoteStreams and attach remote audio stream to an audio element (could also be done via call.remoteAudioUrl)
-* Use client.getLastRtpStats to get AudioLevelOutput statistics to detect 5s of silence
-* Use IBM Text to Speech, Web Audio API and setAudioVideoStream to play audio as in scenario above
+* Use `client.getRemoteStreams` and attach remote audio stream to an audio element (could also be done via `call.remoteAudioUrl`)
+* Use `client.getLastRtpStats` to get `AudioLevelOutput` statistics to detect 5s of silence
+* Use IBM Text to Speech, Web Audio API and `setAudioVideoStream` to play audio as in scenario above
 
 
 ## Getting Started
