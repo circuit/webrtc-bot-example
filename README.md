@@ -1,7 +1,5 @@
 # webrtc-bot-example
 
-> Requires Circuit SDK version 1.2.1900 which will be available mid October 2017.
-
 [Electron](https://electron.atom.io/)-based Bot utilizing the WebRTC capabilities of the [Circuit JS SDK](https://github.com/circuit/circuit-sdk).
 
 > Electron is based on node.js and Chromium and is therefore able to utilize the Circuit JS WebRTC APIs unlike a regular node.js app.
