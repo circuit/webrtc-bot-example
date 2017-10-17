@@ -5,7 +5,7 @@ const BrowserWindow = electron.BrowserWindow;
 const path = require('path');
 const url = require('url');
 
-let debug = /--debug/.test(process.argv[2]);
+let debug = /--dev/.test(process.argv[2]);
 let win;
 
 function createWindow () {

@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "electron . --debug"
+    "dev": "electron . --dev --inspect=5858"
   },
   "repository": "https://github.com/circuit/webrtc-bot-example",
   "keywords": [

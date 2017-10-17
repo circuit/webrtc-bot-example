@@ -61,3 +61,7 @@ typings/
 
 # Configuration file
 config.json
+
+# VS code launch config
+.vscode/*
+!.vscode/launch.json
