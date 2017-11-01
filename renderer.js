@@ -204,5 +204,6 @@ Circuit.supportedEvents.forEach(e =>
 // Initialization
 client.logon()
   .then(user => console.log(`Logged on as bot: ${user.emailAddress}`))
+  .then(() => client.setPresence({state: Circuit.Enums.PresenceState.AVAILABLE}))
   .catch(console.error);
 
