@@ -16,9 +16,16 @@
     <audio controls></audio>
     <audio id="remoteAudio" autoplay></audio>
 
-    <!-- Include the JS SDK since its used in the renderer (not the node.js SDK)
-         By including it inline rather than with require, debugging is easier -->
-    <script type="text/javascript" src="./node_modules/circuit-sdk/dist/circuit.js"></script>
+    <!-- Alternate option to include the JS SDK. Preferred option is to require the
+         circuit.js in the renderer js file. If included here, then the workaround
+         below is needed to include the circuit.js file as global browser module.
+         The reason for this is that electron (with nodeIntegration=true) tries to
+         include the Circuit SDK as commonJS module.
+    <script>module.exports_ = module.exports;delete module.exports;</script>
+    <script type="text/javascript" src="./node_modules/circuit-sdk/circuit.js"></script>
+    <script>module.exports = module.exports_;delete module.exports_;</script>
+     -->
+
     <script type="text/javascript" src="./renderer.js"></script>
   </body>
 </html>

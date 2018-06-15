@@ -2,6 +2,9 @@
 // client crendentials app would be needed to be in multiple calls at
 // the same time.
 
+// Specify the file circuit.js which is the browser SDK to get access to WebRTC APIs.
+const Circuit = require('circuit-sdk/circuit.js');
+
 const config = require('electron').remote.require('./config.json');
 const AUDIO_LEVEL_THRESHOLD = 50;
 
@@ -14,7 +17,8 @@ let interval;
 // Change stats collection from 5s to 1s to be able to detect 5s of silence
 Circuit.RtpStatsConfig.COLLECTION_INTERVAL = 1000;
 
-let client = new Circuit.Client(config.sandbox);
+const client = new Circuit.Client(config.sandbox);
+const audioCtx = new AudioContext();
 
 function playSound(callId, text) {
   let url = 'https://watson-api-explorer.mybluemix.net/text-to-speech/api/v1/synthesize?';
@@ -27,7 +31,6 @@ function playSound(callId, text) {
   fetch(`${url}?${params}`)
     .then(res => res.arrayBuffer())
     .then(buffer => {
-      var audioCtx = new AudioContext();
       var source = audioCtx.createBufferSource();
       var output = audioCtx.createMediaStreamDestination();
 
@@ -37,9 +40,16 @@ function playSound(callId, text) {
         source.buffer = decodedData;
         source.connect(output);
 
+        // ********************
+        // Workaround to force setAudioVideoStream to take the passed stream
+        // This will be fixed in 1.2.3800
+        Circuit.RtcSessionController.enableAudioAGC = !Circuit.RtcSessionController.enableAudioAGC;
+        // ********************
+
         // Set the audio/video stream to be sent and then start the stream
         client.setAudioVideoStream(callId, output.stream)
-          .then(() => source.start(0));
+          .then(() => source.start(0))
+          .catch(console.error);
 
         /* for debugging the stream can be recorded and shown with a player on the UI
         var chunks = [];
