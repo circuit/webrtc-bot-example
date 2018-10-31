@@ -136,10 +136,16 @@ client.addEventListener('callStatus', evt => {
     return;
   }
 
+  // if (activeCall && call.isEstablished) {
+  //   remoteAudio = document.getElementById('remoteAudio');
+  //   remoteAudio.srcObject = call.remoteAudioStream;
+  // }
+
   // Last participant left. Leave as well.
   if (evt.reason === 'participantRemoved' && !call.participants.length) {
     client.leaveConference(evt.call.callId)
-      .then(() => console.log(`Left call: ${evt.call.callId}`));
+      .then(() => console.log(`Left call: ${evt.call.callId}`))
+      .then(() => remoteAudio.srcObject = null);
     return;
   }
 
@@ -152,17 +158,11 @@ client.addEventListener('callStatus', evt => {
 
   if (evt.reason === 'remoteStreamUpdated') {
     // Need to attach the stream to an audio element so that the audioOutputLevel stats (aol) are present
+    // Attach stream to audio element's srcObject attribute
     remoteAudio = document.getElementById('remoteAudio');
-
-    // Option 1: Attach stream to audio element's srcObject attribute
-    //var audioStream = client.getRemoteStreams(activeCall.callId).find(s => s.getAudioTracks().length > 0);
-    //remoteAudio.srcObject = audioStream;
-
-    // Option 2: Attach audio url to element's src attribute
-    remoteAudio.src = call.remoteAudioUrl;
+    remoteAudio.srcObject = call.remoteAudioStream;
     return;
   }
-
 });
 
 // Detect silence on incoming audio stream using RTP stats field 'audioLevelOutput' (aol)
