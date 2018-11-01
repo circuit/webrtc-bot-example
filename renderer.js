@@ -136,11 +136,6 @@ client.addEventListener('callStatus', evt => {
     return;
   }
 
-  // if (activeCall && call.isEstablished) {
-  //   remoteAudio = document.getElementById('remoteAudio');
-  //   remoteAudio.srcObject = call.remoteAudioStream;
-  // }
-
   // Last participant left. Leave as well.
   if (evt.reason === 'participantRemoved' && !call.participants.length) {
     client.leaveConference(evt.call.callId)
