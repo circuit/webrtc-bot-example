@@ -2,13 +2,15 @@
   "sandbox": {
     "domain": "circuitsandbox.net",
     "client_id": "<your client_id>",
-    "client_secret": "<your client_secret>"
+    "client_secret": "<your client_secret>",
+    "scope": "CALL_RECORDING,CALLS,READ_CONVERSATIONS,READ_USER_PROFILE,WRITE_CONVERSATIONS,WRITE_USER_PROFILE",
     "autoRenewToken": true
   },
   "production": {
     "domain": "eu.yourcircuit.com",
     "client_id": "<your client_id>",
-    "client_secret": "<your client_secret>"
+    "client_secret": "<your client_secret>",
+    "scope": "CALL_RECORDING,CALLS,READ_CONVERSATIONS,READ_USER_PROFILE,WRITE_CONVERSATIONS,WRITE_USER_PROFILE",
     "autoRenewToken": true
   }
 }
